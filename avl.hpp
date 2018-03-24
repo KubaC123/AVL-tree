@@ -31,6 +31,7 @@ public:
 	void RR(AVLnode<T>* A);
 	void LL(AVLnode<T>* A);
 	void RL(AVLnode<T>* A);
+	void LR(AVLnode<T>* A);
 	bool InsertNode(const T& value);
 };
 
@@ -148,6 +149,50 @@ void AVLtree<T>::RL(AVLnode<T> *A)
 	{
 		A->bf = C->bf = 0;
 		B->bf = -1;
+	}
+}
+
+/*  Function realizes LR rotation in AVL tree
+ * 		A        C
+ *     /    	/ \
+ *    B	   ->  B   A
+ *     \
+ *      C
+ *  Node C replaces node A which becomes C's right son. C right son becomes A left son.
+ *  Node B becomes left son of node C and takes left son of node C for his right son.
+ *  There are three cases of balance factors before and after rotation.
+ *  param [in] - A - main rotation node 
+ */
+template <class T>
+void AVLtree<T>::LR(AVLnode<T> *A)
+{
+	AVLnode<T> *B = A->left;
+	AVLnode<T> *C = A->right;
+	AVLnode<T> *P = A->parent;
+	B->right = C->left;
+	if(B->right != NULL) B->right->parent = B;
+	A->left = C->right;
+	if(A->left != NULL) A->left->parent = A;
+	C->right = A;
+	C->left = B;
+	B->parent = C;
+	A->parent = C;
+	C->parent = P;
+	if(P == NULL) root = C;
+	else if(P->left == A) P->left = C;
+	else P->right = C;
+
+	// modyfing balance factors
+	if(C->bf == -1)
+	{
+		A->bf = C->bf = 0;
+		B->bf = 1;
+	}
+	else if(C->bf = 0) A->bf = B->bf = C->bf = 0;
+	else
+	{
+		B->bf = C->bf = 0;
+		A->bf = -1;
 	}
 }
 
