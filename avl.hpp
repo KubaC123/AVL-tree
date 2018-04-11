@@ -196,10 +196,81 @@ void AVLtree<T>::LR(AVLnode<T> *A)
 	}
 }
 
+/*	Function adds new node to the tree
+ *	param [in] - const reference to new node key value
+ *	[out] - true
+ */
+
 template <class T>
 bool AVLtree<T>::InsertNode(const T& value)
 {
+	AVLnode<T> *NewNode = new AVLnode<T>(value);	// initializing new node
+	AVLnode<T> *P = root;
+	if(root == NULL)	// if tree is empty
+	{
+		root = NewNode;
+		return true;
+	}
+	else
+	{
+		while(true)
+		{
+			if(value < P->key)	// comparing key values, moving to left or right subtree
+			{
+				if(P->left == NULL)
+				{
+					P->left = NewNode;
+					break;
+				}
+				else P = P->left;
+			}
+			else
+			{
+				if(P->right == NULL)
+				{
+					P->right = NewNode;
+					break;
+				}
+				else P = P->right;
+			}
+		}
+		NewNode->parent = P;	// P is always NewNode parent
+	}
 	
+	// check and modify balance factors
+	if(P->bf == 0) 
+	{
+		if(P->left == NewNode) P->bf = 1;
+		else P->bf = -1;
+	}
+	
+	// moving up the tree to find node which has incorrect bf
+	AVLnode<T>* R = P->parent;
+	while(R)
+	{
+		if(R->bf)
+		{
+			if(R->bf == 1)
+			{
+				if(R->right == P) R->bf = 0;
+				else if(P->bf == -1) LR(R);
+				else LL(R);
+			}
+			else // R->bf == -1
+			{
+				if(R->left == P) R->bf = 0;
+				else if(P->bf == 1) Rl(R);
+				else RR(R);
+			}
+			return true;
+			break;
+		}
+		
+		if(R->left == P) R->bf = 1;
+		else R->bf = -1;
+		P = R;
+		R = R->parent;
+	}
 }
 
 
